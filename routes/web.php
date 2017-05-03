@@ -11,6 +11,50 @@
 |
 */
 
-Route::get('/', function () {
+Route::get('/', function (){
     return view('welcome');
 });
+//3. Creating a simple form
+Route::get('userform', function (){
+  return View::make('userform');
+});
+//-End
+//4. Gathering form input to display on another page
+Route::post('userform', function(){
+   	 // Process the data here
+    	return Redirect::to('userresults')->withInput(Input::only('username', 'color'));
+});
+
+Route::get('userresults', function(){
+    return 'Your username is: '. Input::old('username').'<br>Your favorite color is: '. Input::old('color');
+});
+//-End
+//11. Cropping an image with Jcrop
+Route::get('imageform', function() {
+    return View::make('imageform');
+});
+
+Route::post('imageform', function() {
+    $rules = array(
+        'image' => 'required|mimes:jpeg,jpg|max:10000'
+    );
+
+    $validation = Validator::make(Input::all(), $rules);
+
+    if ($validation->fails()) {
+        return Redirect::to('imageform')->withErrors($validation);
+    }else {
+        $file = Input::file('image');
+        $file_name = $file->getClientOriginalName();
+        if ($file->move('images', $file_name)) {
+            return Redirect::to('jcrop')->with('image',$file_name);
+        }else {
+            return "Error uploading file";
+        }
+    }
+});
+
+Route::get('jcrop', function() {
+    return View::make('jcrop')->with('image', 'images/'. Session::get('image'));
+});
+//-End
