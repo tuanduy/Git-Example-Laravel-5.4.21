@@ -112,3 +112,6 @@ Route::post('captcha', function() {
   return Redirect::to('captcha');
 });
 //-End
+//14. Setting up and configuring the Auth library
+
+//-End
