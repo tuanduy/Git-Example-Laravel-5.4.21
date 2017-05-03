@@ -57,4 +57,43 @@ Route::post('imageform', function() {
 Route::get('jcrop', function() {
     return View::make('jcrop')->with('image', 'images/'. Session::get('image'));
 });
+
+Route::post('jcrop', function() {
+    $quality = 90;
+
+    $src  = Input::get('image');
+    $img  = imagecreatefromjpeg($src);
+    $dest = ImageCreateTrueColor(Input::get('w'),Input::get('h'));
+
+    imagecopyresampled($dest, $img, 0, 0, Input::get('x'),Input::get('y'), Input::get('w'), Input::get('h'),Input::get('w'), Input::get('h'));
+    imagejpeg($dest, $src, $quality);
+
+    return "<img src='" . $src . "'>";
+});
+//-End
+
+//12. Creating an autocomplete text input
+Route::get('autocomplete', function() {
+    return View::make('autocomplete');
+});
+
+Route::get('getdata', function() {
+		$term = Str::lower(Input::get('term'));
+		$data = array(
+			'R' => 'Red',
+			'O' => 'Orange',
+			'Y' => 'Yellow',
+			'G' => 'Green',
+			'B' => 'Blue',
+			'I' => 'Indigo',
+			'V' => 'Violet',
+		);
+		$return_array = array();
+		foreach ($data as $k => $v) {
+			if (strpos(Str::lower($v), $term) !== FALSE) {
+				$return_array[] = array('value' => $v, 'id' => $k);
+			}
+		}
+		return Response::json($return_array);
+});
 //-End
