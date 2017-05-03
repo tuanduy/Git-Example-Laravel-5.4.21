@@ -97,3 +97,18 @@ Route::get('getdata', function() {
 		return Response::json($return_array);
 });
 //-End
+//13. Making a CAPTCHA-style spam catcher
+Route::get('captcha', function() {
+		$captcha = new Captcha;
+		$cap = $captcha->make();
+		return View::make('captcha')->with('cap', $cap);
+});
+Route::post('captcha', function() {
+  if (Session::get('my_captcha') !==Input::get('captcha')) {
+    Session::flash('captcha_result', 'No Match.');
+  }else {
+    Session::flash('captcha_result', 'They Match!');
+  }
+  return Redirect::to('captcha');
+});
+//-End
