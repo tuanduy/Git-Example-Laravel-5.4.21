@@ -14,171 +14,78 @@
 Route::get('/', function (){
     return view('welcome');
 });
+//1.2 Router structure
+//route with conditions only number no limit
+Route::get('codition/{number}', function($ten)
+{
+  return "Đây là số: ".$ten;
+})->where(['number'=>'[0-9]+']);
+//Route wiht conditions only characters no limit
+Route::get('condition-char/{name}', function($name1)
+{
+  return "This is my Name: ".$name1;
+})->where(['name'=> '[a-zA-Z]+']);
+//Route with condition only letter must 6 characters
+Route::get('condition-char-limit/{your_name}', function($name2)
+{
+  return "Are your name: ".$name2." ?";
+})->where(['your_name' => '[a-z]{6}']);
+//Route wiht conditions only characters and number no limit
+Route::get('condition-char-number/{name_number}', function($name3)
+{
+  return "This is my Name: ".$name3;
+})->where(['name_number'=> '[0-9a-zA-Z]+']);
+//Route with multiplevariable and condition for variable
+Route::get( 'name_numer_condition/{tenjk}/{stt}' , function($ten, $phone)
+{
+           return "Chào bạn: ".$ten." "."Số điện thoại: ".$phone;
+})->where([ 'tenjk' => '[a-zA-Z]+'],[ 'stt' => '[0-9]+']);
+//-End
+//1.3 Route call view basic
+Route::get('call-view/{your?}', function($you = ' ')
+{
+  $name = "i love you";
+  return View('thisview',compact('name','you'));
+});
+//-End
+//1.4. Route call function from controller
+Route::get('test-action', 'Controller@testAction');
+Route::get('test-action-val/{val}/{hjj}', 'Controller@testActionValue');
+//-End
+//1.5. Route Identification
+Route::get('test-identification', 'Controller@testIdentification');
+
+Route::get('identification',['as'=>'ide', function()
+{
+  return "This is identification";
+}]);
+//-End
 //3. Creating a simple form
-Route::get('userform', function (){
+Route::get('userform', function ()
+{
   return View::make('userform');
 });
 //-End
 //4. Gathering form input to display on another page
-Route::post('userform', function(){
+Route::post('userform', function()
+{
    	 // Process the data here
     	return Redirect::to('userresults')->withInput(Input::only('username', 'color'));
 });
 
-Route::get('userresults', function(){
+Route::get('userresults', function()
+{
     return 'Your username is: '. Input::old('username').'<br>Your favorite color is: '. Input::old('color');
 });
 //-End
-//5.form validating user input
-Route::get('userform1', function(){
-    return View::make('userform1');
-});
-Route::post('userform1', function(){
-    $rules = array(
-        'email' => 'required|email|different:username',
-        'username' => 'required|min:6',
-        'password' => 'required|same:password_confirm'
-    );
-    $validation = Validator::make(Input::all(), $rules);
-    if ($validation->fails()){
-        return Redirect::to('userform1')->withErrors($validation)->withInput();
-    }
-    return Redirect::to('userresults1')->withInput();
-});
-Route::get('userresults1', function(){
-    return dd(Input::old());
-});
-//-End
-//6. form file upload
-Route::get('fileform', function(){
-    return View::make('fileform');
-});
-Route::post('fileform', function(){
-    $file = Input::file('myfile');
-    if (isset($file)){
-    	$ext = $file->guessExtension();
-    	$file->move('files', 'newfilename.'.$ext);
-        return 'Success';
-    }else{
-        return 'Error';
-    }
-});
-//-End
-//7. Validating a file upload
-Route::get('fileform1', function(){
-    return View::make('fileform1');
-});
-Route::post('fileform1', function(){
-    $rules = array(
-    	'myfile' => 'mimes:doc,docx,pdf,txt|max:1000'
-    );
-
-    $validation = Validator::make(Input::all(), $rules);
-    if ($validation->fails()){
-		return Redirect::to('fileform1')->withErrors($validation)->withInput();
-    }else{
-        $file = Input::file('myfile');
-        if ($file->move('files', $file->getClientOriginalName())){
-            return "Success";
-        }else{
-            return "Error";
-        }
-    }
-});
-//-End
-//8. Creating a custom error message
-Route::get('myform2', function(){
-    return View::make('myform2');
-});
-Route::post('myform2', array('before' => 'csrf', function(){
-    $rules = array(
-        'email'    => 'required|email|min:6',
-        'username' => 'required|min:6',
-        'password' => 'required'
-    );
-
-    $messages = array(
-        'min' => 'Way too short! The :attribute must be atleast :min characters in length.',
-        'username.required' => 'We really, really need aUsername.'
-    );
-
-    $validation = Validator::make(Input::all(), $rules,$messages);
-
-    if ($validation->fails()){
-        return Redirect::to('myform2')->withErrors($validation)->withInput();
-    }
-    return Redirect::to('myresults2')->withInput();
-}));
-Route::get('myresults2', function(){
-    return dd(Input::old());
-});
-//-End
-//9. Adding a honey pot to a form
-Route::get('myform', function(){
-    return View::make('myform');
-});
-Route::post('myform', array('before' => 'csrf', function(){
-    $rules = array(
-        'email'    => 'required|email',
-        'password' => 'required',
-        'no_email' => 'honey_pot'
-    );
-    $messages = array(
-        'honey_pot' => 'Nothing should be in this field.'
-    );
-    $validation = Validator::make(Input::all(), $rules,$messages);
-
-    if ($validation->fails()){
-        return Redirect::to('myform')->withErrors($validation)->withInput();
-    }
-
-    return Redirect::to('myresults')->withInput();
-}));
-
-Validator::extend('honey_pot', function($attribute, $value,$parameters){
-    return $value == '';
-});
-
-Route::get('myresults', function(){
-    return dd(Input::old());
-});
-//-End
-//10. Uploading an image using Redactor
-Route::get('redactor', function(){
-    return View::make('redactor');
-});
-
-Route::post('redactorupload', function(){
-
-    $rules = array(
-        'file' => 'image|max:10000'
-    );
-
-    $validation = Validator::make(Input::all(), $rules);
-    $file = Input::file('file');
-
-    if ($validation->fails()){
-        return FALSE;
-    }else{
-        if ($file->move('files', $file->getClientOriginalName())){
-            return Response::json(array('filelink' => 'files/' . $file->getClientOriginalName()));
-        }else{
-            return FALSE;
-        }
-    }
-});
-
-Route::post('redactor', function(){
-    return dd(Input::all());
-});
-//-End
-
 //11. Cropping an image with Jcrop
-Route::get('imageform', function() {
+Route::get('imageform', function()
+{
     return View::make('imageform');
 });
 
-Route::post('imageform', function() {
+Route::post('imageform', function()
+{
     $rules = array(
         'image' => 'required|mimes:jpeg,jpg|max:10000'
     );
@@ -198,11 +105,13 @@ Route::post('imageform', function() {
     }
 });
 
-Route::get('jcrop', function() {
+Route::get('jcrop', function()
+{
     return View::make('jcrop')->with('image', 'images/'. Session::get('image'));
 });
 
-Route::post('jcrop', function() {
+Route::post('jcrop', function()
+{
     $quality = 90;
 
     $src  = Input::get('image');
@@ -217,11 +126,13 @@ Route::post('jcrop', function() {
 //-End
 
 //12. Creating an autocomplete text input
-Route::get('autocomplete', function() {
+Route::get('autocomplete', function()
+{
     return View::make('autocomplete');
 });
 
-Route::get('getdata', function() {
+Route::get('getdata', function()
+{
 		$term = Str::lower(Input::get('term'));
 		$data = array(
 			'R' => 'Red',
@@ -242,12 +153,15 @@ Route::get('getdata', function() {
 });
 //-End
 //13. Making a CAPTCHA-style spam catcher
-Route::get('captcha', function() {
+Route::get('captcha', function()
+{
 		$captcha = new Captcha;
 		$cap = $captcha->make();
 		return View::make('captcha')->with('cap', $cap);
 });
-Route::post('captcha', function() {
+
+Route::post('captcha', function()
+{
   if (Session::get('my_captcha') !==Input::get('captcha')) {
     Session::flash('captcha_result', 'No Match.');
   }else {

@@ -10,4 +10,17 @@ use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 class Controller extends BaseController
 {
     use AuthorizesRequests, DispatchesJobs, ValidatesRequests;
+
+    public function testAction()
+    {
+      echo "This is action testAction from class Controller";
+    }
+    public function testIdentification()
+    {
+      return redirect()->route("ide");
+    }
+    public function testActionValue($val1, $val2)
+    {
+      echo " This value of test action variable: ".$val1.$val2;
+    }
 }
