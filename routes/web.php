@@ -54,11 +54,52 @@ Route::get('test-action-val/{val}/{hjj}', 'Controller@testActionValue');
 //-End
 //1.5. Route Identification
 Route::get('test-identification', 'Controller@testIdentification');
-
 Route::get('identification',['as'=>'ide', function()
 {
   return "This is identification";
 }]);
+//-End
+//1.6. Route group
+Route::group(['prefix'=>'thuc-don'], function ()
+{
+  Route::get('bun-bo', function()
+  {
+      echo "Đây là trang bún bò";
+  });
+  Route::get('bun-man', function()
+  {
+      echo "Đây là trang bún măng";
+  });
+  Route::get('bun-moc', function()
+  {
+      echo "Đây là trang bún mộc";
+  });
+});
+//-End
+//2. Create View
+Route::get('goi-view', function()
+{
+  return View('layouts.sub_layout.sub_view');
+});
+Route::get('goi-view-2', function()
+{
+  return View('layouts.sub_layout.sub_view_2');
+});
+//2.1. View share
+View::share('variable_name','Đây là nội dung cần chia sẽ !');
+//2.2. View Composer
+View::Composer('layouts.sub_layout.sub_view', function($bien){
+  return $bien->with('thongtin','Đây là trang chia sẽ <br>');
+});
+//2.3 View check View Exists
+Route::get('check-view', function()
+{
+  if (view()->exists('layouts.sub_layout.sub_view_2')) {
+    return "Tồn tại view";
+  }else {
+    return "Không tồn tại view";
+  }
+});
 //-End
 //3. Creating a simple form
 Route::get('userform', function ()
