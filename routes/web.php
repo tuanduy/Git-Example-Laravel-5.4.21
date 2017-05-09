@@ -101,6 +101,16 @@ Route::get('check-view', function()
   }
 });
 //-End
+//3. Blade template
+Route::get('goi-master', function()
+{
+  return view('master.master_view');
+});
+Route::get('goi-sub', function()
+{
+  return view('master.sub_view');
+});
+//-End
 //3. Creating a simple form
 Route::get('userform', function ()
 {
