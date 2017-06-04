@@ -14,6 +14,10 @@
 Route::get('/', function (){
     return view('welcome');
 });
+Route::get('ifo', function()
+{
+  return ;
+});
 //1.2 Router structure
 //route with conditions only number no limit
 Route::get('codition/{number}', function($ten)
@@ -110,13 +114,521 @@ Route::get('goi-sub', function()
 {
   return view('master.sub_view');
 });
+Route::get('goi-layout', function()
+{
+  return view('master.layout_view');
+});
 //-End
+//bài 11. URL
+/*
+ trả về giá trị đường dẫn trên thanh địa chỉ
+*/
+Route::get('url/full', function()
+{
+  return URL::full();
+});
+Route::get('url/asset', function()
+{
+  return asset('css/mystyle.css',true);
+});
+/*
+Dùng để nhúng vào thẻ <a> href để dẫn đến 1 trang khác
+hoặc get một dường dẫn mới về
+*/
+Route::get('url/to', function()
+{
+//  return URL::to('test-action-val',['dsfsdfs','123465']);
+  return URL::to('test-action-val',['dsfsdfs','123465'], true);
+});
+/*
+chỉ sử dụng cho https với phương thức ssl
+*/
+Route::get('url/secure', function()
+{
+  return secure_url('test-action-val',['dsfsdfs','123465']);
+});
+//13. SCHEMA BUILDER
+Route::get('schema/create', function()
+{
+  Schema::create('khoapham',function($table)
+  {
+      $table->increments('id');
+      $table->string('tenmonhoc');
+      $table->integer('gia');
+      $table->text('ghichu')->nullable();
+      $table->timestamps();
+  });
+});
+/*
+Đổi tên bảng trong database
+*/
+Route::get('schema/rename', function()
+{
+  Schema::rename('khoapham','kpt');
+});
+/*
+Xóa 1 bảng
+*/
+Route::get('schema/drop', function()
+{
+  Schema::drop('product');
+});
+Route::get('schema/drop-ext', function()
+{
+  Schema::dropIfExists('kpt');
+});
+/*
+Thay đổi thuộc tính của một cột
+*/
+Route::get('schema/change-col-attr', function()
+{
+  Schema::table('khoapham',function($table)
+  {
+    $table->string('tenmonhoc',50)->change();
+  });
+});
+/*
+Xóa 1 cột
+*/
+Route::get('schema/drop-col', function()
+{
+  Schema::table('khoapham',function($table)
+  {
+    $table->dropColumn('ghichu');
+  });
+});
+Route::get('schema/drop-colm', function()
+{
+  Schema::table('khoapham',function($table)
+  {
+    $table->dropColumn(['tenmonhoc','gia']);
+  });
+});
+/*
+Tạo khóa ngoại
+*/
+Route::get('schema/create/cate', function()
+{
+  Schema::create('categogy',function($table)
+  {
+      $table->increments('id');
+      $table->string('name');
+      $table->timestamps();
+  });
+});
+Route::get('schema/create/product', function()
+{
+  Schema::create('product',function($table)
+  {
+      $table->increments('id');
+      $table->string('name');
+      $table->string('price');
+      $table->integer('product_cate_id')->unsigned();
+      $table->foreign('product_cate_id')->references('id')->on('categogy')->onDelete('cascade');
+      $table->timestamps();
+  });
+});
 //3. Creating a simple form
 Route::get('userform', function ()
 {
   return View::make('userform');
 });
 //-End
+
+//Bai 21 Query Builder
+//21.1. Query Builder Select All data
+Route::get('query/select-all', function()
+{
+  $data = DB::table('product')->get();
+  echo "<pre>";
+  print_r($data);
+  echo "<pre>";
+});
+//21.2. Query Builder Select column
+Route::get('query/select-columm', function()
+{
+  $data = DB::table('product')->select('name')->get();
+  echo "<pre>";
+  print_r($data);
+  echo "<pre>";
+});
+//21.3. Query Builder Select column where
+Route::get('query/select-where', function()
+{
+  $data = DB::table('product')->select('name')->where('id',2)->get();
+  echo "<pre>";
+  print_r($data);
+  echo "<pre>";
+});
+//21.4. Query Builder Select column where or quare
+Route::get('query/select-orwhere', function()
+{
+  $data = DB::table('product')->select('name')->where('id',2)->orWhere('price',5000)->get();
+  echo "<pre>";
+  print_r($data);
+  echo "<pre>";
+});
+//21.4.1. Query Builder Select column where or quare
+Route::get('query/select-whereandwhere', function()
+{
+  $data = DB::table('product')->select('name')->where('id',2)->Where('price',5000)->get();
+  echo "<pre>";
+  print_r($data);
+  echo "<pre>";
+});
+//-End
+//21.5. Query Builder Select order by
+Route::get('query/orderBy', function()
+{
+  $data = DB::table('product')->orderBy('id','DESC')->get();
+  echo "<pre>";
+  print_r($data);
+  echo "<pre>";
+});
+Route::get('query/orderBy', function()
+{
+  $data = DB::table('product')->select('name')->where('price',5000)->orderBy('id','DESC')->get();
+  echo "<pre>";
+  print_r($data);
+  echo "<pre>";
+});
+//-End
+//21.6 Query Builder Select limit
+Route::get('query/offsetlimit', function()
+{
+  $data = DB::table('product')->skip(2)->take(3)->get();
+  echo "<pre>";
+  print_r($data);
+  echo "<pre>";
+});
+//-End
+//21.6 Query Builder Select limit
+Route::get('query/offsetlimit', function()
+{
+  $data = DB::table('product')->skip(2)->take(3)->get();
+  echo "<pre>";
+  print_r($data);
+  echo "<pre>";
+});
+//-End
+//21.7 Query Builder Select where between
+Route::get('query/wherebetween', function()
+{
+  $data = DB::table('product')->whereBetween('id',[2,4])->get();
+  echo "<pre>";
+  print_r($data);
+  echo "<pre>";
+});
+//-End
+//21.8 Query Builder Select where Not Between
+Route::get('query/wherenotbetween', function()
+{
+  $data = DB::table('product')->whereNotBetween('id',[2,4])->get();
+  echo "<pre>";
+  print_r($data);
+  echo "<pre>";
+});
+//-End
+//21.9 Query Builder Select where In
+Route::get('query/whereIn', function()
+{
+  $data = DB::table('product')->whereIn('id',[2,4,8])->get();
+  echo "<pre>";
+  print_r($data);
+  echo "<pre>";
+});
+//-End
+//21.9.1 Query Builder Select where Not In
+Route::get('query/whereNotIn', function()
+{
+  $data = DB::table('product')->whereNotIn('id',[2,4,8])->get();
+  echo "<pre>";
+  print_r($data);
+  echo "<pre>";
+});
+//-End
+//21.11 Query Builder Count Row
+Route::get('query/count', function()
+{
+  $data = DB::table('product')->count();
+  echo "<pre>";
+  print_r($data);
+  echo "<pre>";
+});
+//-End
+//21.12 Query Builder max Row
+Route::get('query/max', function()
+{
+  $data = DB::table('product')->max('price');
+  echo "<pre>";
+  print_r($data);
+  echo "<pre>";
+});
+//-End
+//21.12 Query Builder min Row
+Route::get('query/min', function()
+{
+  $data = DB::table('product')->min('price');
+  echo "<pre>";
+  print_r($data);
+  echo "<pre>";
+});
+//-End
+//21.13 Query Builder AVG row
+Route::get('query/avg', function()
+{
+  $data = DB::table('product')->avg('price');
+  echo "<pre>";
+  print_r($data);
+  echo "<pre>";
+});
+//-End
+//21.13 Query Builder sum row
+Route::get('query/sum', function()
+{
+  $data = DB::table('product')->sum('price');
+  echo "<pre>";
+  print_r($data);
+  echo "<pre>";
+});
+//-End
+//24 Query Builder joins
+Route::get('schema/create/cateNew', function()
+{
+  Schema::create('cate_news',function($table)
+  {
+      $table->increments('id');
+      $table->string('name');
+      $table->timestamps();
+  });
+});
+Route::get('schema/create/news', function()
+{
+  Schema::create('news',function($table)
+  {
+      $table->increments('id');
+      $table->string('title');
+      $table->string('intro');
+      $table->integer('cate_id')->unsigned();
+      $table->timestamps();
+  });
+});
+
+Route::get('query/join', function()
+{
+  $data = DB::table('news')->select('title','name')->join('cate_news','news.cate_id','=','cate_news.id')->get();
+  echo "<pre>";
+  print_r($data);
+  echo "<pre>";
+});
+//-End
+//25.1 Query Builder Insert
+Route::get('query/insert', function()
+{
+  DB::table('product')->insert([
+    ['name'=>'Quan di bien', 'price'=>50000, 'product_cate_id'=>2],
+  ]);
+  return 'Insert thanh cong';
+});
+//-End
+//25.2 Query Builder Insert return id end
+Route::get('query/insert-get-id', function()
+{
+  $id = DB::table('product')->insertGetId(
+    ['name'=>'Quan di bien dd', 'price'=>5100, 'product_cate_id'=>3]
+  );
+  echo $id;
+});
+//-End
+//25.3 Query Builder Update
+Route::get('query/Update', function()
+{
+  DB::table('product')->Where('id',5)->update(
+    ['name'=>'Quan di bien 123', 'price'=>5200, 'product_cate_id'=>3]
+  );
+  return 'Update thanh cong';
+});
+//-End
+//25.3.1 Query Builder Update where >
+Route::get('query/Updatethan', function()
+{
+  DB::table('product')->Where('id','>',7)->update(
+    ['name'=>'Quan di bien 1234', 'price'=>5123]
+  );
+  return 'Update thanh cong';
+});
+//-End
+//25.4. Query Builder Delete
+Route::get('query/delete', function()
+{
+  DB::table('product')->Where('id',7)->delete();
+  return 'Xoa thanh cong';
+});
+//-End
+//25.4.1 Query Builder Delete <=
+Route::get('query/deleteLessEqua', function()
+{
+  DB::table('product')->Where('id','<=',6)->delete();
+  return 'Xoa thanh cong';
+});
+//-End
+//27. Eloquent ORM get data from table
+Route::get('model/select-all', function()
+{
+  $data = App\product::all()->toArray();
+  echo "<pre>";
+  print_r($data);
+  echo "<pre>";
+});
+
+
+Route::get('model/select-id', function()
+{
+  $data = App\product::find(8)->tojSon();
+  echo "<pre>";
+  print_r($data);
+  echo "<pre>";
+});
+
+Route::get('model/select-findOrFail', function()
+{
+  $data = App\product::findOrFail(2)->tojSon();
+  echo "<pre>";
+  print_r($data);
+  echo "<pre>";
+});
+
+//-End
+//28. Eloquent ORM
+Route::get('model/where', function()
+{
+  $data = App\Product::where('price',5123)->get()->toArray();
+  echo "<pre>";
+  print_r($data);
+  echo "<pre>";
+});
+
+Route::get('model/take', function()
+{
+  $data = App\Product::where('price',5123)->firstOrFail()->take(2)->get()->toArray();
+  echo "<pre>";
+  print_r($data);
+  echo "<pre>";
+});
+
+Route::get('model/raw', function()
+{
+  $data = App\Product::WhereRaw('price = ? AND id = ?',[5123,8])->get()->toArray();
+  echo "<pre>";
+  print_r($data);
+  echo "<pre>";
+});
+//-End
+//29. Eloquent ORM with select
+Route::get('model/select', function(App\Product $product)
+{
+  $data = $product::WhereRaw('price = ? AND id = ?',[5123,8])->select('name')->get()->toArray();
+  echo "<pre>";
+  print_r($data);
+  echo "<pre>";
+});
+//-End
+//30. Eloquent ORM with Insert, Update
+
+Route::get('model/insert', function()
+{
+  $product = new App\Product;
+  $product->name = 'quan cong so';
+  $product->price = 5000;
+  $product->product_cate_id = 3;
+  $product->save();
+  echo "them thanh cong";
+});
+
+Route::get('model/create', function()
+{
+  $data = array(
+    'name'=>' Quan jean kaki',
+    'price'=>'54222',
+    'product_cate_id'=>'3'
+  );
+  App\Product::create($data);
+});
+//Update data
+Route::get('model/update', function()
+{
+  $product = App\Product::find(11);
+  $product->price = 1;
+  $product->save();
+});
+//Delete data
+Route::get('model/delete', function()
+{
+  App\Product::destroy(12);
+});
+//-End
+
+//32. Eloquent ORM Relation  one-many
+Route::get('relation/one-many', function()
+{
+  $data = App\Product::find(2)->images()->get()->toArray();
+  echo "<pre>";
+  print_r($data);
+  echo "</pre>";
+});
+
+Route::get('relation/one-many-1', function()
+{
+  $data = App\Images::find(2)->product()->get()->toArray();
+  echo "<pre>";
+  print_r($data);
+  echo "</pre>";
+});
+//-End
+//33. Eloquent ORM Relation  many-many
+Route::get('relation/many-many', function()
+{
+  $data = App\Car::find(4)->color()->get()->toArray();
+  echo "<pre>";
+  print_r($data);
+  echo "<\pre>";
+});
+
+Route::get('relation/many-many-1', function()
+{
+  $data = App\Colors::find(1)->car()->get()->toArray();
+  echo "<pre>";
+  print_r($data);
+  echo "<\pre>";
+});
+//-End
+//35.Form
+Route::get('form/layout12', function()
+{
+  return View('form/layout');
+});
+
+Route::post('form/data',['as'=>'sendEmail',function()
+{
+    return "Ok";
+}]);
+//-End
+
+//36. form
+Route::get('form/dangky', function()
+{
+  return View('form.dangky');
+});
+
+Route::post('form/dang-ky-thanh-vien',['as'=>'postDangKy','uses'=>'KhoaPhamController@them']);
+//-End
+// 39.Form
+Route::any('{all}', function()
+{
+  return view('welcome');
+})->where('all', '.*');
+//-End
+
 //4. Gathering form input to display on another page
 Route::post('userform', function()
 {
